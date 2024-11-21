@@ -1,0 +1,13 @@
+This aim of this collection manager is to create a system for tracking data for charity clubs. This is inspired by my personal involvement with the charity Space 2 Be Me – which is a charity that supports children with disabilities. We run many clubs for different ages and need a more efficient way of storing data such as attendees for a particular session, and also information about those attendees that allows all staff and volunteers to easily view information needed to support them properly. The current system is in a hard to read Excel file, that cannot be updated or viewed by multiple people. 
+Requirements
+•	As a club leader, I want to be able to see which children and young adults are on each session so that I can keep track of which children are attending each session.
+•	As a club leader, I want to be able to add children and young adults to sessions so that I can know who is attending.
+•	As a club leader, I want to be able to remove children and young adults from sessions so that I can know who is attending.
+•	As a club leader, I want to be able to see the club timetable so I can know what is happening and when.
+•	As a club leader, I want to create an accessible user interface so that all users can use it easily.
+•	As a club leader, I want to be able to view data about the children and young adults that they provide on booking so that I can support them better.
+•	As a club leader, I want to be able to update data about the children and young adults that they provide on booking so that I can support them better.
+•	As a club leader, I want to create and view notes from past sessions so that I can keep track of what happened.
+•	As a club leader, I want to securely log into the system so that my data is protected, and access is restricted to authorized individuals.
+•	As a club leader, I want to be able to load data from a csv file so that I can view existing data.
+•	As a club leader, I want to be able to load data back to a csv file so I can easily view and sort data.
