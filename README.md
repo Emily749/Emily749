@@ -1,4 +1,4 @@
 ## Hi there 👋
 
 
-I'm a software engineering student aspiring to a job in the technology industry.
+I'm a software engineering degree apprentice in technology
