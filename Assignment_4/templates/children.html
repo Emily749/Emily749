@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Children</h2>
+<a href="{{ url_for('add_child') }}" class="btn btn-primary mb-3">Add New Child</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Guardian</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for child in children %}
+        <tr>
+            <td>{{ child.id }}</td>
+            <td>{{ child.name }}</td>
+            <td>{{ child.age }}</td>
+            <td>{{ child.guardian_name }}</td>
+            <td>
+                <a href="{{ url_for('delete_child', child_id=child.id) }}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
