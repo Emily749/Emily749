@@ -1,98 +1,55 @@
-from flask import Flask
-from models import db, User, Child, Session, Attendance, Note
+from flask import Flask, render_template, request, redirect, url_for, flash
+from models import db, User, Child, Session, Attendance
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///charity_club.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Initialize the database after the app is created
+app.config['SECRET_KEY'] = 'your_secret_key'  # Used for flash messages and session management
 db.init_app(app)
 
-@app.route('/')
-def home():
-    return "Hello, Charity Club Manager!"
-
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  # Create tables if they don't exist
-    app.run(debug=True)
-    
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+# Sample Data Creation Route (for testing)
+@app.route('/init')
+def init_db():
+    db.create_all()
+    return "Database Initialized!"
 
 @app.route('/')
 def home():
     return render_template('home.html')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/sessions')
+def sessions():
+    all_sessions = Session.query.all()
+    return render_template('sessions.html', sessions=all_sessions)
+
+@app.route('/children')
+def children():
+    children_data = Child.query.all()
+    return render_template('children.html', children=children_data)
+
+@app.route('/add_child', methods=['GET', 'POST'])
+def add_child():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        user = User.query.filter_by(username=username).first()
-        if user and bcrypt.check_password_hash(user.password_hash, password):
-            login_user(user)
-            flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid username or password', 'danger')
-    return render_template('login.html')
+        name = request.form['name']
+        age = request.form['age']
+        guardian_name = request.form['guardian_name']
+        new_child = Child(name=name, age=age, guardian_name=guardian_name)
+        db.session.add(new_child)
+        db.session.commit()
+        flash("Child added successfully!", "success")
+        return redirect(url_for('children'))
+    return render_template('add_child.html')
 
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    flash('You have been logged out.', 'info')
-    return redirect(url_for('login'))
-
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    sessions = Session.query.all()
-    return render_template('dashboard.html', sessions=sessions)
-
-@app.route('/add_attendee/<int:session_id>', methods=['GET', 'POST'])
-@login_required
-def add_attendee(session_id):
-    if request.method == 'POST':
-        child_id = request.form['child_id']
-        child = Child.query.get(child_id)
-        session = Session.query.get(session_id)
-        if not Attendance.query.filter_by(child_id=child_id, session_id=session_id).first():
-            attendance = Attendance(child_id=child.id, session_id=session.id)
-            db.session.add(attendance)
-            db.session.commit()
-            flash(f'{child.name} has been added to the session.', 'success')
-        else:
-            flash('Child already added to this session.', 'info')
-    children = Child.query.all()
-    return render_template('add_attendee.html', session_id=session_id, children=children)
-
-@app.route('/view_session/<int:session_id>')
-@login_required
-def view_session(session_id):
-    session = Session.query.get(session_id)
-    attendees = Attendance.query.filter_by(session_id=session_id).all()
-    return render_template('view_session.html', session=session, attendees=attendees)
-
-@app.route('/export_csv')
-@login_required
-def export_csv():
-    children = Child.query.all()
-    data = [
-        {
-            'Name': child.name,
-            'Age': child.age,
-            'Guardian Contact': child.guardian_contact,
-            'Special Requirements': child.special_requirements
-        } for child in children
-    ]
-    df = pd.DataFrame(data)
-    csv_path = 'data/children_export.csv'
-    df.to_csv(csv_path, index=False)
-    return send_file(csv_path, as_attachment=True)
+@app.route('/delete_child/<int:child_id>')
+def delete_child(child_id):
+    child = Child.query.get_or_404(child_id)
+    db.session.delete(child)
+    db.session.commit()
+    flash("Child removed successfully!", "success")
+    return redirect(url_for('children'))
 
 if __name__ == '__main__':
-    db.create_all()
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
