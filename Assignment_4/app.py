@@ -1,21 +1,22 @@
-from flask import Flask, render_template, redirect, url_for, flash, request, send_file
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-import pandas as pd
-from werkzeug.security import generate_password_hash, check_password_hash
-import os
+from flask import Flask
+from models import db, User, Child, Session, Attendance, Note
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///club_manager.db'
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///charity_club.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-from models import User, Child, Session, Attendance, Note
+# Initialize the database after the app is created
+db.init_app(app)
 
+@app.route('/')
+def home():
+    return "Hello, Charity Club Manager!"
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # Create tables if they don't exist
+    app.run(debug=True)
+    
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
