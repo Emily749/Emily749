@@ -4,8 +4,8 @@ import urllib.parse
 from datetime import datetime
 
 sessions = [
-    {"id": 1, "name": "SAMS", "date": "2024-12-25", "age_range": "0-6", "disability": "Any", "children": []},
-    {"id": 2, "name": "Starships", "date": "2024-12-26", "age_range": "6-11", "disability": "Any", "children": []}
+    {"id": 1, "name": "Yoga", "date": "2024-12-25", "age_range": "5-10", "disability": "None", "children": []},
+    {"id": 2, "name": "Art Class", "date": "2024-12-26", "age_range": "8-12", "disability": "Physical", "children": []}
 ]
 
 class ClubHandler(SimpleHTTPRequestHandler):
@@ -22,6 +22,9 @@ class ClubHandler(SimpleHTTPRequestHandler):
         elif self.path.startswith("/remove_session/"):
             session_id = self.path.split("/")[2]
             self.remove_session(session_id)
+        elif self.path.startswith("/remove_child/"):
+            session_id, child_index = self.path.split("/")[2:4]
+            self.remove_child(session_id, child_index)
         elif self.path.startswith("/static/"):
             super().do_GET()
         else:
@@ -153,8 +156,13 @@ class ClubHandler(SimpleHTTPRequestHandler):
             <h3>Children:</h3>
             <ul>
             """
-            for child in session["children"]:
-                children_html += f"<li>{child['name']} (Age: {child['age']}, Disability: {child.get('disability', 'N/A')})</li>"
+            for index, child in enumerate(session["children"]):
+                children_html += f"""
+                <li>
+                    {child['name']} (Age: {child['age']}, Disability: {child.get('disability', 'N/A')})
+                    <a href="/remove_child/{session['id']}/{index}"><button>Remove</button></a>
+                </li>
+                """
             children_html += "</ul><a href='/view_sessions'><button>Back</button></a>"
             self.wfile.write(children_html.encode())
         else:
@@ -181,6 +189,16 @@ class ClubHandler(SimpleHTTPRequestHandler):
             self.end_headers()
         else:
             self.send_error(400, "Invalid input")
+
+    def remove_child(self, session_id, child_index):
+        session = next((s for s in sessions if s["id"] == int(session_id)), None)
+        if session and 0 <= int(child_index) < len(session["children"]):
+            session["children"].pop(int(child_index))
+            self.send_response(302)
+            self.send_header('Location', f'/manage_children/{session_id}')
+            self.end_headers()
+        else:
+            self.send_error(404, "Child not found")
 
     def remove_session(self, session_id):
         global sessions
