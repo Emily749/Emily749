@@ -1,0 +1,85 @@
+{
+  "sessions": [
+    {
+      "id": 1,
+      "name": "SAMS",
+      "date": "2024-12-12",
+      "age_range": "0-6",
+      "disability": "NA",
+      "notes": "notes",
+      "children": []
+    },
+    {
+      "id": 2,
+      "name": "SAMS",
+      "date": "2024-12-12",
+      "age_range": "0-6",
+      "disability": "NA",
+      "notes": "notes",
+      "children": []
+    },
+    {
+      "id": 3,
+      "name": "SAMS",
+      "date": "2024-10-03",
+      "age_range": "0-6",
+      "disability": "NA",
+      "notes": "notes",
+      "children": []
+    },
+    {
+      "id": 4,
+      "name": "Starships",
+      "date": "2024-10-11",
+      "age_range": "6-12",
+      "disability": "NA",
+      "notes": "notes",
+      "children": []
+    },
+    {
+      "id": 5,
+      "name": "Starships",
+      "date": "2024-09-04",
+      "age_range": "6-12",
+      "disability": "NA",
+      "notes": "notes",
+      "children": []
+    },
+    {
+      "id": 6,
+      "name": "Starships",
+      "date": "2024-02-01",
+      "age_range": "6-12",
+      "disability": "NA",
+      "notes": "notes",
+      "children": []
+    },
+    {
+      "id": 7,
+      "name": "Dance Stars",
+      "date": "2024-02-01",
+      "age_range": "6-25",
+      "disability": "NA",
+      "notes": "notes",
+      "children": []
+    },
+    {
+      "id": 8,
+      "name": "Dance Stars",
+      "date": "2024-10-11",
+      "age_range": "6-25",
+      "disability": "NA",
+      "notes": "notes",
+      "children": []
+    },
+    {
+      "id": 9,
+      "name": "Dance Stars",
+      "date": "2024-10-03",
+      "age_range": "6-25",
+      "disability": "NA",
+      "notes": "notes",
+      "children": []
+    }
+  ]
+}
