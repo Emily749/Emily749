@@ -4,8 +4,8 @@ import urllib.parse
 from datetime import datetime
 
 sessions = [
-    {"id": 1, "name": "Yoga", "date": "2024-12-25", "age_range": "5-10", "disability": "None", "children": []},
-    {"id": 2, "name": "Art Class", "date": "2024-12-26", "age_range": "8-12", "disability": "Physical", "children": []}
+    {"id": 1, "name": "SAMS", "date": "2025-01-26", "age_range": "0-6", "disability": "NA", "children": []},
+    {"id": 2, "name": "Starships", "date": "2025-02-12", "age_range": "6-12", "disability": "NA", "children": []}
 ]
 
 class ClubHandler(SimpleHTTPRequestHandler):
@@ -103,6 +103,8 @@ class ClubHandler(SimpleHTTPRequestHandler):
             <input type="text" id="age_range" name="age_range" required><br><br>
             <label for="disability">Disability:</label>
             <input type="text" id="disability" name="disability"><br><br>
+            <label for="notes">Notes:</label>
+            <input type="text" id="notes" name="notes"><br><br>
             <button type="submit">Add Session</button>
         </form>
         <a href="/"><button>Back to Home</button></a>
@@ -118,6 +120,7 @@ class ClubHandler(SimpleHTTPRequestHandler):
         session_date = form_data.get('session_date', [''])[0]
         age_range = form_data.get('age_range', [''])[0]
         disability = form_data.get('disability', [''])[0]
+        notes = form_data.get('notes', [''])[0]
 
         if session_name and session_date:
             new_session = {
@@ -126,6 +129,7 @@ class ClubHandler(SimpleHTTPRequestHandler):
                 "date": session_date,
                 "age_range": age_range,
                 "disability": disability,
+                "notes": notes,
                 "children": []
             }
             sessions.append(new_session)
@@ -151,6 +155,8 @@ class ClubHandler(SimpleHTTPRequestHandler):
                 <input type="text" id="child_age" name="child_age" required><br><br>
                 <label for="child_disability">Child Disability:</label>
                 <input type="text" id="child_disability" name="child_disability"><br><br>
+                <label for="child_guardian">Child Guardian:</label>
+                <input type="text" id="child_guardian" name="child_guardian"><br><br>
                 <button type="submit">Add Child</button>
             </form>
             <h3>Children:</h3>
@@ -159,7 +165,7 @@ class ClubHandler(SimpleHTTPRequestHandler):
             for index, child in enumerate(session["children"]):
                 children_html += f"""
                 <li>
-                    {child['name']} (Age: {child['age']}, Disability: {child.get('disability', 'N/A')})
+                    {child['name']} (Age: {child['age']}, Disability: {child.get('disability', 'N/A')}, Guardian: {child['guardian']})
                     <a href="/remove_child/{session['id']}/{index}"><button>Remove</button></a>
                 </li>
                 """
@@ -176,13 +182,15 @@ class ClubHandler(SimpleHTTPRequestHandler):
         child_name = form_data.get('child_name', [''])[0]
         child_age = form_data.get('child_age', [''])[0]
         child_disability = form_data.get('child_disability', [''])[0]
+        child_guardian = form_data.get('child_guardian', [''])[0]
 
         session = next((s for s in sessions if s["id"] == int(session_id)), None)
         if session and child_name:
             session["children"].append({
                 "name": child_name,
                 "age": child_age,
-                "disability": child_disability
+                "disability": child_disability,
+                "guardian": child_guardian
             })
             self.send_response(302)
             self.send_header('Location', f'/manage_children/{session_id}')
