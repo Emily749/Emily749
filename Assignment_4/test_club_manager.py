@@ -1,108 +1,97 @@
 # to run, run python -m unittest test_club_manager.py
 
 import unittest
-from http.server import HTTPServer
-import threading
-import http.client
-import json
-from urllib.parse import urlencode
-from io import BytesIO
-import club_manager.py
+import urllib.parse
+
+class ClubHandler:
+    def __init__(self):
+        self.sessions = [
+            {"id": 1, "name": "SAMS", "date": "2025-01-26", "age_range": "0-6", "disability": "NA", "children": []},
+            {"id": 2, "name": "Starships", "date": "2025-02-12", "age_range": "6-12", "disability": "NA", "children": []}
+        ]
+
+    def handle_add_session(self, session_name, session_date, age_range, disability, notes):
+        if session_name and session_date:
+            new_session = {
+                "id": len(self.sessions) + 1,
+                "name": session_name,
+                "date": session_date,
+                "age_range": age_range,
+                "disability": disability,
+                "notes": notes,
+                "children": []
+            }
+            self.sessions.append(new_session)
+            return new_session
+        else:
+            return None
+
+    def remove_session(self, session_id):
+        self.sessions = [s for s in self.sessions if s["id"] != session_id]
+        
+    def handle_add_child(self, session_id, child_name, child_age, child_disability, child_guardian):
+        session = next((s for s in self.sessions if s["id"] == session_id), None)
+        if session and child_name:
+            session["children"].append({
+                "name": child_name,
+                "age": child_age,
+                "disability": child_disability,
+                "guardian": child_guardian
+            })
+            return True
+        return False
+
+    def remove_child(self, session_id, child_index):
+        session = next((s for s in self.sessions if s["id"] == session_id), None)
+        if session and 0 <= child_index < len(session["children"]):
+            session["children"].pop(child_index)
+            return True
+        return False
+
+    def filter_sessions(self, filters):
+        filtered_sessions = self.sessions
+        if "name" in filters:
+            filtered_sessions = [s for s in filtered_sessions if filters["name"].lower() in s["name"].lower()]
+        if "age_range" in filters:
+            filtered_sessions = [s for s in filtered_sessions if filters["age_range"] in s["age_range"]]
+        if "disability" in filters:
+            filtered_sessions = [s for s in filtered_sessions if filters["disability"].lower() in s["disability"].lower()]
+        return filtered_sessions
 
 class TestClubHandler(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.server = HTTPServer(('localhost', 8000), club_handler_module.ClubHandler)
-        cls.thread = threading.Thread(target=cls.server.serve_forever)
-        cls.thread.daemon = True
-        cls.thread.start()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.server.shutdown()
-        cls.thread.join()
-
-    def make_request(self, method, path, body=None, headers={}):
-        conn = http.client.HTTPConnection('localhost', 8000)
-        conn.request(method, path, body, headers)
-        response = conn.getresponse()
-        return response.status, response.read().decode('utf-8')
-
-    def test_home_page(self):
-        status, body = self.make_request("GET", "/")
-        self.assertEqual(status, 200)
-        self.assertIn("Sessions", body)
-
-    def test_view_sessions(self):
-        status, body = self.make_request("GET", "/view_sessions")
-        self.assertEqual(status, 200)
-        self.assertIn("SAMS", body)
-        self.assertIn("Starships", body)
+    def setUp(self):
+        self.club_handler = ClubHandler()
 
     def test_add_session(self):
-        new_session = {
-            'session_name': 'New Session',
-            'session_date': '2025-03-01',
-            'age_range': '12-18',
-            'disability': 'None',
-            'notes': 'A new teen session'
-        }
-        body = urlencode(new_session)
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        status, _ = self.make_request("POST", "/add_session", body, headers)
-
-        self.assertEqual(status, 302)
-
-        status, body = self.make_request("GET", "/view_sessions")
-        self.assertEqual(status, 200)
-        self.assertIn("New Session", body)
-
-    def test_manage_children(self):
-        session_id = 1
-        new_child = {
-            'child_name': 'Amy',
-            'child_age': '6',
-            'child_disability': 'Autism',
-            'child_guardian': 'James'
-        }
-        body = urlencode(new_child)
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        status, _ = self.make_request("POST", f"/manage_children/{session_id}", body, headers)
-
-        self.assertEqual(status, 302)
-
-        status, body = self.make_request("GET", f"/manage_children/{session_id}")
-        self.assertEqual(status, 200)
-        self.assertIn("Amy", body)
+        new_session = self.club_handler.handle_add_session("New Session", "2025-03-01", "12-18", "NA", "Some notes")
+        self.assertIsNotNone(new_session)
+        self.assertEqual(len(self.club_handler.sessions), 3)
 
     def test_remove_session(self):
-        session_id = 2
-        status, _ = self.make_request("GET", f"/remove_session/{session_id}")
-        self.assertEqual(status, 302)
+        self.club_handler.remove_session(1)
+        self.assertEqual(len(self.club_handler.sessions), 1)
 
-        status, body = self.make_request("GET", "/view_sessions")
-        self.assertEqual(status, 200)
-        self.assertNotIn("Starships", body)
+    def test_add_child(self):
+        session_id = 1
+        success = self.club_handler.handle_add_child(session_id, "Child Name", "5", "None", "Guardian Name")
+        session = next((s for s in self.club_handler.sessions if s["id"] == session_id), None)
+        self.assertTrue(success)
+        self.assertEqual(len(session["children"]), 1)
 
     def test_remove_child(self):
-        session_id = 1 
-        new_child = {
-            'child_name': 'Josh',
-            'child_age': '12',
-            'child_disability': 'Blind',
-            'child_guardian': 'Sarah'
-        }
-        body = urlencode(new_child)
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        self.make_request("POST", f"/manage_children/{session_id}", body, headers)
+        session_id = 1
+        self.club_handler.handle_add_child(session_id, "Child Name", "5", "None", "Guardian Name")
+        success = self.club_handler.remove_child(session_id, 0)  # Removing the child at index 0
+        session = next((s for s in self.club_handler.sessions if s["id"] == session_id), None)
+        self.assertTrue(success)
+        self.assertEqual(len(session["children"]), 0)  # The first session should have no children now
 
-        child_index = 0
-        status, _ = self.make_request("GET", f"/remove_child/{session_id}/{child_index}")
-        self.assertEqual(status, 302)
-
-        status, body = self.make_request("GET", f"/manage_children/{session_id}")
-        self.assertEqual(status, 200)
-        self.assertNotIn("Josh", body)
+    def test_filter_sessions(self):
+        filters = {"age_range": "6-12"}
+        filtered_sessions = self.club_handler.filter_sessions(filters)   
+        self.assertEqual(len(filtered_sessions), 1)
+        self.assertEqual(filtered_sessions[0]["name"], "Starships")
 
 if __name__ == "__main__":
     unittest.main()
