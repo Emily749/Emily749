@@ -51,7 +51,7 @@ class ClubHandler(SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-
+    
         session_html = "<h2>Sessions</h2>"
         session_html += """
         <form method="GET" action="/view_sessions">
@@ -64,10 +64,10 @@ class ClubHandler(SimpleHTTPRequestHandler):
             <button type="submit">Filter</button>
         </form>
         """
-        
+    
         query_string = urllib.parse.urlparse(self.path).query
         filters = urllib.parse.parse_qs(query_string)
-
+    
         filtered_sessions = sessions
         if "name" in filters:
             filtered_sessions = [s for s in filtered_sessions if filters["name"][0].lower() in s["name"].lower()]
@@ -75,16 +75,17 @@ class ClubHandler(SimpleHTTPRequestHandler):
             filtered_sessions = [s for s in filtered_sessions if filters["age_range"][0] in s["age_range"]]
         if "disability" in filters:
             filtered_sessions = [s for s in filtered_sessions if filters["disability"][0].lower() in s["disability"].lower()]
-
+    
         for session in filtered_sessions:
             session_html += f"""
             <div>
                 <b>{session["name"]}</b> on {session["date"]} (Age: {session["age_range"]}, Disability: {session["disability"]})
+                <p><strong>Notes:</strong> {session.get("notes", "No notes available")}</p>
                 <a href="/manage_children/{session['id']}"><button>Manage Children</button></a>
                 <a href="/remove_session/{session['id']}"><button>Remove Session</button></a>
             </div>
             """
-
+    
         session_html += '<a href="/"><button>Back to Home</button></a>'
         self.wfile.write(session_html.encode())
 
