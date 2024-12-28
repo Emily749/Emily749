@@ -1,46 +1,31 @@
 ```mermaid
 erDiagram
-    USER {
-        int id PK
-        string username
-        string password
-        string role
+    HOMEPAGE {
+        int id 
+        string title
+        string theme_color
+    }
+    SESSION {
+        int id 
+        string name
+        datetime date
+        int age_range
+        string disability
     }
     CHILD {
-        int id PK
+        int id 
         string name
         int age
         string guardian_contact
-        string special_requirements
-        boolean is_on_waitlist
+        string disability
     }
-    SESSION {
-        int id PK
-        string name
-        datetime start_time
-        datetime end_time
-        string location
-    }
-    ATTENDANCE {
-        int id PK
-        int session_id FK
-        int child_id FK
-    }
-    TIMETABLE {
-        int id PK
-        datetime date
-        string description
-    }
-    NOTE {
-        int id PK
-        int session_id FK
-        text content
-        datetime created_at
+    SESSION_CHILD {
+        int id
+        int session_id 
+        int child_id 
     }
 
     %% Relationships
-    USER ||--o{ SESSION : "creates or manages"
-    CHILD ||--o{ ATTENDANCE : "is added to"
-    SESSION ||--o{ ATTENDANCE : "has attendees"
-    TIMETABLE ||--|| SESSION : "maps to"
-    SESSION ||--o{ NOTE : "has notes"
+    HOMEPAGE ||--o{ SESSION : "links to sessions"
+    SESSION ||--o{ SESSION_CHILD : "has children"
+    CHILD ||--o{ SESSION_CHILD : "attends sessions"
