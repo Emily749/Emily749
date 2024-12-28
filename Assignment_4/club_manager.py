@@ -3,10 +3,20 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer
 import urllib.parse
 from datetime import datetime
 
-sessions = [
-    {"id": 1, "name": "SAMS", "date": "2025-01-26", "age_range": "0-6", "disability": "NA", "children": []},
-    {"id": 2, "name": "Starships", "date": "2025-02-12", "age_range": "6-12", "disability": "NA", "children": []}
-]
+DATA_FILE = "localization.json"
+
+def load_sessions():
+    global sessions
+    try:
+        with open(DATA_FILE, "r") as f:
+            sessions = json.load(f)["sessions"]    
+    except FileNotFoundError:
+        sessions = [{"id": 1, "name": "SAMS", "date": "2025-01-26", "age_range": "0-6", "disability": "NA", "children": []},
+        {"id": 2, "name": "Starships", "date": "2025-02-12", "age_range": "6-12", "disability": "NA", "children": []}]
+
+def save_sessions():
+    with open(DATA_FILE, "w") as f:
+        json.dump({"sessions": sessions}, f, indent=4)
 
 class ClubHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
@@ -51,7 +61,7 @@ class ClubHandler(SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-    
+
         session_html = "<h2>Sessions</h2>"
         session_html += """
         <form method="GET" action="/view_sessions">
@@ -64,10 +74,10 @@ class ClubHandler(SimpleHTTPRequestHandler):
             <button type="submit">Filter</button>
         </form>
         """
-    
+
         query_string = urllib.parse.urlparse(self.path).query
         filters = urllib.parse.parse_qs(query_string)
-    
+
         filtered_sessions = sessions
         if "name" in filters:
             filtered_sessions = [s for s in filtered_sessions if filters["name"][0].lower() in s["name"].lower()]
@@ -75,7 +85,7 @@ class ClubHandler(SimpleHTTPRequestHandler):
             filtered_sessions = [s for s in filtered_sessions if filters["age_range"][0] in s["age_range"]]
         if "disability" in filters:
             filtered_sessions = [s for s in filtered_sessions if filters["disability"][0].lower() in s["disability"].lower()]
-    
+
         for session in filtered_sessions:
             session_html += f"""
             <div>
@@ -85,7 +95,7 @@ class ClubHandler(SimpleHTTPRequestHandler):
                 <a href="/remove_session/{session['id']}"><button>Remove Session</button></a>
             </div>
             """
-    
+
         session_html += '<a href="/"><button>Back to Home</button></a>'
         self.wfile.write(session_html.encode())
 
@@ -134,6 +144,7 @@ class ClubHandler(SimpleHTTPRequestHandler):
                 "children": []
             }
             sessions.append(new_session)
+            save_sessions()          
             self.send_response(302)
             self.send_header('Location', '/view_sessions')
             self.end_headers()
@@ -186,13 +197,19 @@ class ClubHandler(SimpleHTTPRequestHandler):
         child_guardian = form_data.get('child_guardian', [''])[0]
 
         session = next((s for s in sessions if s["id"] == int(session_id)), None)
+
         if session and child_name:
-            session["children"].append({
-                "name": child_name,
-                "age": child_age,
-                "disability": child_disability,
-                "guardian": child_guardian
-            })
+            new_session = {
+                "id": len(sessions) + 1,
+                "name": session_name,
+                "date": session_date,
+                "age_range": age_range,
+                "disability": disability,
+                "notes": notes,
+                "children": []
+            }
+            sessions.append(new_session)
+            save_sessions()
             self.send_response(302)
             self.send_header('Location', f'/manage_children/{session_id}')
             self.end_headers()
@@ -225,4 +242,5 @@ def run(server_class=HTTPServer, handler_class=ClubHandler, port=8000):
 
 
 if __name__ == "__main__":
+    load_sessions()
     run()
