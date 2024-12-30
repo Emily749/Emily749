@@ -56,7 +56,10 @@ class ClubHandler(SimpleHTTPRequestHandler):
         with open("templates/home.html", "r") as f:
             home_html = f.read()
         self.wfile.write(home_html.encode())
-
+        
+# As a club leader, I want to be able to see the upcoming clubs so I can know what is happening and when.
+# As a parent, I want to see dates of upcoming clubs so that I can plan ahead.
+    
     def serve_view_sessions(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
@@ -85,7 +88,9 @@ class ClubHandler(SimpleHTTPRequestHandler):
             filtered_sessions = [s for s in filtered_sessions if filters["age_range"][0] in s["age_range"]]
         if "disability" in filters:
             filtered_sessions = [s for s in filtered_sessions if filters["disability"][0].lower() in s["disability"].lower()]
-
+            
+# As a club leader, I want to create and view notes for sessions so that I can keep track of additional information.
+        
         for session in filtered_sessions:
             session_html += f"""
             <div>
@@ -150,13 +155,20 @@ class ClubHandler(SimpleHTTPRequestHandler):
             self.end_headers()
         else:
             self.send_error(400, "Invalid input")
-
+            
+# As a club leader, I want to be able to see which children and young adults are on each session so that I can keep track of which children are attending each session.
+# As a parent, I want to be able to see which other children are attending the session.
+    
     def serve_manage_children(self, session_id):
         session = next((s for s in sessions if s["id"] == int(session_id)), None)
         if session:
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
+            
+# As a club leader, I want to be able to view data about the children and young adults that they provide on booking so that I can support them better.
+# As a club leader, I want to be able to update data about the children and young adults that they provide on booking so that I can support them better.
+# As a parent, I want to be able to add information about my child so that they can be supported properly. 
 
             children_html = f"""
             <h2>Manage Children for {session["name"]}</h2>
@@ -185,7 +197,9 @@ class ClubHandler(SimpleHTTPRequestHandler):
             self.wfile.write(children_html.encode())
         else:
             self.send_error(404, "Session not found")
-
+            
+# As a club leader, I want to be able to add children and young adults to sessions so that I can know who is attending.
+    
     def handle_add_child(self, session_id):
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
@@ -216,6 +230,8 @@ class ClubHandler(SimpleHTTPRequestHandler):
         else:
             self.send_error(400, "Invalid input")
 
+# As a club leader, I want to be able to remove children and young adults from sessions so that I can know who is attending.
+    
     def remove_child(self, session_id, child_index):
         session = next((s for s in sessions if s["id"] == int(session_id)), None)
         if session and 0 <= int(child_index) < len(session["children"]):
