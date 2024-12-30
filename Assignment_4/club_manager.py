@@ -5,6 +5,8 @@ from datetime import datetime
 
 DATA_FILE = "localization.json"
 
+# As a club leader, I want to be able to load data from a json file so that I can view existing data.
+
 def load_sessions():
     global sessions
     try:
