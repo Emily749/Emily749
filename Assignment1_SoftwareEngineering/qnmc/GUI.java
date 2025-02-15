@@ -7,7 +7,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Iterator;
 import java.util.Set;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,14 +28,13 @@ public class GUI extends JFrame {
 
     private JTextArea resultTextArea;
     private JButton calculateButton;
-    @SuppressWarnings("unused")
-    private int dummyCounter = 0;
 
     static public int bitCount = 0;
     static public Set<String> mintermSet;
     public String currentInput;
     GetMintermList mintermList = new GetMintermList();
 
+    // Helper method to generate binary representation based on input size
     static public String getBinary(String input, int bits) {
         int maxIndex = (int) Math.pow(2, bits) - 1; // Calculate the max value for the given bit size
         String[] binaryValues = new String[maxIndex + 1];
@@ -46,9 +44,9 @@ public class GUI extends JFrame {
         }
 
         try {
-            int index = Integer.parseInt(input);
+            int index = Integer.parseInt(input);  // Handling NumberFormatException
             if (index < 0 || index > maxIndex) {
-                throw new ArrayIndexOutOfBoundsException();
+                throw new ArrayIndexOutOfBoundsException();  // Throw ArrayIndexOutOfBoundsException if index is out of range
             }
             return binaryValues[index];
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
@@ -78,38 +76,39 @@ public class GUI extends JFrame {
         mintermInputField = new JTextField();
         mintermInputField.setBounds(50, 140, 70, 30);
 
-        mintermInputField.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent event) {
-                // Not used
-            }
+        // Consolidate all number validation
+		mintermInputField.addKeyListener(new KeyListener() {
+			@Override
+			public void keyReleased(KeyEvent event) {
+			String inputText = mintermInputField.getText();
+			try {
+				int bits = MenuBar.bits;
+				int input = Integer.parseInt(inputText); // Consolidate all number validation
 
-            @Override
-            public void keyReleased(KeyEvent event) {
-                String inputText = mintermInputField.getText();
-                try {
-                    int bits = MenuBar.bits;
-                    int input = Integer.parseInt(inputText);
+				if (bits == 3 && (input < 0 || input > 7)) {
+				showErrorMessage("Number should be within 0 to 7");
+				} else if (bits == 4 && (input < 0 || input > 15)) {
+				showErrorMessage("Number should be within 0 to 15");
+				} else if (bits == 5 && (input < 0 || input > 31)) {
+				showErrorMessage("Number should be within 0 to 31");
+				} else {
+				currentInput = inputText;
+				}
+			} catch (NumberFormatException e) {
+				showErrorMessage("Invalid input. Please enter a valid number.");
+			}
+			}
 
-                    if (bits == 3 && (input < 0 || input > 7)) {
-                        showErrorMessage("Number should be within 0 to 7");
-                    } else if (bits == 4 && (input < 0 || input > 15)) {
-                        showErrorMessage("Number should be within 0 to 15");
-                    } else if (bits == 5 && (input < 0 || input > 31)) {
-                        showErrorMessage("Number should be within 0 to 31");
-                    } else {
-                        currentInput = inputText;
-                    }
-                } catch (NumberFormatException e) {
-                    showErrorMessage("Invalid input. Please enter a valid number.");
-                }
-            }
+			@Override
+			public void keyPressed(KeyEvent event) {
+			// No implementation needed
+			}
 
-            @Override
-            public void keyPressed(KeyEvent event) {
-                // Not used
-            }
-        });
+			@Override
+			public void keyTyped(KeyEvent event) {
+			// No implementation needed
+			}
+		});
         mainPanel.add(mintermInputField);
 
         nextButton = new JButton("Next");
@@ -140,6 +139,7 @@ public class GUI extends JFrame {
 
                     while (iterator.hasNext()) {
                         String minterm = iterator.next();
+                        // Refactor repeated binary conversion based on bits
                         quine.addTerm(getBinary(minterm, MenuBar.bits));
                     }
 
@@ -160,6 +160,7 @@ public class GUI extends JFrame {
         add(mainPanel);
     }
 
+    // Helper method to show error messages
     private void showErrorMessage(String message) {
         JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
