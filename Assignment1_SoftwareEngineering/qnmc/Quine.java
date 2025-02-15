@@ -15,10 +15,11 @@ public class Quine {
 	}
 
 	// converted to string
+        @Override
 	public String toString() {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		for (int i = 0; i < count; i++) {
-			buf.append(terms[i] + "\n");
+			buf.append(terms[i]).append("\n");
 		}
 		return buf.toString();
 	}
@@ -33,6 +34,7 @@ public class Quine {
 	}
 
 	// verification of the function
+        @SuppressWarnings("empty-statement")
 	public void simplify() throws ExceptionQuine {
 		while (reduce() > 0)
 			;

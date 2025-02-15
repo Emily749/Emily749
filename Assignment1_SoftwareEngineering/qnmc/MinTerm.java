@@ -18,34 +18,23 @@ public class MinTerm {
 		term = new int[str.length()];
 		for (int i = 0; i < str.length(); i++) {
 			switch (str.charAt(i)) {
-			case NOT_CH:
-				term[count++] = NOT;
-				break;
-			case SET_CH:
-				term[count++] = SET;
-				break;
-			case ANY_CH:
-				term[count++] = ANY;
-				break;
+			case NOT_CH -> term[count++] = NOT;
+			case SET_CH -> term[count++] = SET;
+			case ANY_CH -> term[count++] = ANY;
 			}
 		}
 	}
 
 	// converted to string
 
+        @Override
 	public String toString() {
-		StringBuffer buf = new StringBuffer(count);
+		StringBuilder buf = new StringBuilder(count);
 		for (int i = 0; i < count; i++) {
 			switch (term[i]) {
-			case NOT:
-				buf.append(NOT_CH);
-				break;
-			case SET:
-				buf.append(SET_CH);
-				break;
-			case ANY:
-				buf.append(ANY_CH);
-				break;
+			case NOT -> buf.append(NOT_CH);
+			case SET -> buf.append(SET_CH);
+			case ANY -> buf.append(ANY_CH);
 			}
 		}
 		return buf.toString();
@@ -95,7 +84,7 @@ public class MinTerm {
 	public static MinTerm combine(MinTerm a, MinTerm b) throws ExceptionQuine {
 		if (a.count != b.count)
 			throw new ExceptionQuine("MinTerm::combine()");
-		StringBuffer buf = new StringBuffer(a.count);
+		StringBuilder buf = new StringBuilder(a.count);
 		for (int i = 0; i < a.count; i++) {
 			if (a.term[i] != b.term[i])
 				buf.append(ANY_CH);
