@@ -3,7 +3,6 @@ package qnmc;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-
 import javax.swing.*;
 
 public class MenuBar extends JMenuBar {
@@ -34,7 +33,7 @@ public class MenuBar extends JMenuBar {
 
 			public void actionPerformed(ActionEvent arg0) {
 
-				if(GUI.set!=null)GUI.set.clear();
+				if(GUI.mintermSet!=null)GUI.mintermSet.clear();
 				
 				String s = JOptionPane
 						.showInputDialog("Enter the boolean bits(3 to 5): ");
