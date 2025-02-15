@@ -2,10 +2,8 @@ package qnmc;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.Iterator;
 import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,18 +14,19 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class GUI extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private JPanel mainPanel;
+    private final JPanel mainPanel;
 
-    private JLabel mintermLabel;
+    private final JLabel mintermLabel;
     private JTextField mintermInputField;
-    private JButton nextButton;
+    private final JButton nextButton;
 
     private JTextArea resultTextArea;
-    private JButton calculateButton;
+    private final JButton calculateButton;
 
     static public int bitCount = 0;
     static public Set<String> mintermSet;
@@ -40,7 +39,7 @@ public class GUI extends JFrame {
         String[] binaryValues = new String[maxIndex + 1];
         
         for (int i = 0; i <= maxIndex; i++) {
-            binaryValues[i] = String.format("%0" + bits + "d", Integer.parseInt(Integer.toBinaryString(i)));
+            binaryValues[i] = String.format("%0" + bits + "d", Integer.valueOf(Integer.toBinaryString(i)));
         }
 
         try {
@@ -77,48 +76,44 @@ public class GUI extends JFrame {
         mintermInputField.setBounds(50, 140, 70, 30);
 
         // Consolidate all number validation
-		mintermInputField.addKeyListener(new KeyListener() {
-			@Override
-			public void keyReleased(KeyEvent event) {
-			String inputText = mintermInputField.getText();
-			try {
-				int bits = MenuBar.bits;
-				int input = Integer.parseInt(inputText); // Consolidate all number validation
+        mintermInputField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyPressed(KeyEvent event) {
+                // No action needed for keyPressed
+            }
 
-				if (bits == 3 && (input < 0 || input > 7)) {
-				showErrorMessage("Number should be within 0 to 7");
-				} else if (bits == 4 && (input < 0 || input > 15)) {
-				showErrorMessage("Number should be within 0 to 15");
-				} else if (bits == 5 && (input < 0 || input > 31)) {
-				showErrorMessage("Number should be within 0 to 31");
-				} else {
-				currentInput = inputText;
-				}
-			} catch (NumberFormatException e) {
-				showErrorMessage("Invalid input. Please enter a valid number.");
-			}
-			}
+            @Override
+            public void keyTyped(KeyEvent event) {
+                // No action needed for keyTyped
+            }
+            @Override
+            public void keyReleased(KeyEvent event) {
+                String inputText = mintermInputField.getText();
+                try {
+                    int bits = MenuBar.bits;
+                    int input = Integer.parseInt(inputText); // Consolidate all number validation
 
-			@Override
-			public void keyPressed(KeyEvent event) {
-			// No implementation needed
-			}
-
-			@Override
-			public void keyTyped(KeyEvent event) {
-			// No implementation needed
-			}
-		});
+                    if (bits == 3 && (input < 0 || input > 7)) {
+                        showErrorMessage("Number should be within 0 to 7");
+                    } else if (bits == 4 && (input < 0 || input > 15)) {
+                        showErrorMessage("Number should be within 0 to 15");
+                    } else if (bits == 5 && (input < 0 || input > 31)) {
+                        showErrorMessage("Number should be within 0 to 31");
+                    } else {
+                        currentInput = inputText;
+                    }
+                } catch (NumberFormatException e) {
+                    showErrorMessage("Invalid input. Please enter a valid number.");
+                }
+            }
+        });
         mainPanel.add(mintermInputField);
 
         nextButton = new JButton("Next");
         nextButton.setBounds(140, 140, 70, 30);
-        nextButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                mintermInputField.setText("");
-                mintermList.setMinList(currentInput);
-            }
+        nextButton.addActionListener((ActionEvent event) -> {
+            mintermInputField.setText("");
+            mintermList.setMinList(currentInput);
         });
         mainPanel.add(nextButton);
 
@@ -129,29 +124,21 @@ public class GUI extends JFrame {
 
         calculateButton = new JButton("Calculate");
         calculateButton.setBounds(400, 250, 100, 50);
-        calculateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    Quine quine = new Quine();
-                    mintermSet = GetMintermList.getMin();
-                    Iterator<String> iterator = mintermSet.iterator();
-
-                    while (iterator.hasNext()) {
-                        String minterm = iterator.next();
-                        // Refactor repeated binary conversion based on bits
-                        quine.addTerm(getBinary(minterm, MenuBar.bits));
-                    }
-
-                    quine.simplify();
-                    resultTextArea.setText(quine.toString());
-                } catch (ExceptionQuine e) {
-                    JOptionPane.showMessageDialog(null, "An error occurred during the Quine-McCluskey operation. Please check your input.", "Error", JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, "An unexpected error occurred. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
+        calculateButton.addActionListener((ActionEvent event) -> {
+            try {
+                Quine quine = new Quine();
+                mintermSet = GetMintermList.getMin();
+                for (String minterm : mintermSet) {
+                    // Refactor repeated binary conversion based on bits
+                    quine.addTerm(getBinary(minterm, MenuBar.bits));
                 }
+                
+                quine.simplify();
+                resultTextArea.setText(quine.toString());
+            } catch (ExceptionQuine e) {
+                JOptionPane.showMessageDialog(null, "An error occurred during the Quine-McCluskey operation. Please check your input.", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "An unexpected error occurred. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
         mainPanel.add(calculateButton);
@@ -173,9 +160,8 @@ public class GUI extends JFrame {
                     break;
                 }
             }
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
             JOptionPane.showMessageDialog(null, "Error setting look and feel. Defaulting to system look and feel.", "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
 
         String bitsInput = JOptionPane.showInputDialog("Enter the boolean bits(3 to 5): ");
