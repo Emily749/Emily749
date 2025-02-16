@@ -95,33 +95,48 @@ public class GUI extends JFrame {
         add(mainPanel);
     }
 
+    private void calculateAction() {
+        try {
+            Quine quine = new Quine();
+            processMinterms(quine);
+            quine.simplify();
+            updateResult(quine);
+        } catch (ExceptionQuine e) {
+            showErrorMessage("An error occurred during the Quine-McCluskey operation. Please check your input.", "Error");
+        } catch (Exception e) {
+            showErrorMessage("An unexpected error occurred. Please try again.", "Error");
+        }
+    }
+
+    private void processMinterms(Quine quine) throws ExceptionQuine {
+        for (String minterm : mintermSet) {
+            quine.addMinTerms(getBinary(minterm));
+        }
+    }
+
+    private void updateResult(Quine quine) {
+        resultTextArea.setText(quine.toString());
+    }
+
     private void validateInput(String inputText) {
         try {
-            int input = Integer.parseInt(inputText);
-            int maxValue = (int) Math.pow(2, bitCount) - 1;
-            if (input < 0 || input > maxValue) {
-                showErrorMessage("Number should be within 0 to " + maxValue, "Error");
-            } else {
+            int input = parseInteger(inputText);
+            if (isValidRange(input)) {
                 currentInput = inputText;
+            } else {
+                showErrorMessage("Number should be within 0 to " + ((int) Math.pow(2, bitCount) - 1), "Error");
             }
         } catch (NumberFormatException e) {
             showErrorMessage("Invalid input. Please enter a valid number.", "Error");
         }
     }
 
-    private void calculateAction() {
-        try {
-            Quine quine = new Quine();
-            for (String minterm : mintermSet) {
-                quine.addMinTerms(getBinary(minterm));
-            }
-            quine.simplify();
-            resultTextArea.setText(quine.toString());
-        } catch (ExceptionQuine e) {
-            showErrorMessage("An error occurred during the Quine-McCluskey operation. Please check your input.", "Error");
-        } catch (Exception e) {
-            showErrorMessage("An unexpected error occurred. Please try again.", "Error");
-        }
+    private int parseInteger(String inputText) {
+        return Integer.parseInt(inputText);
+    }
+
+    private boolean isValidRange(int input) {
+        return input >= 0 && input <= (int) Math.pow(2, bitCount) - 1;
     }
 
     private void showErrorMessage(String message, String error) {
@@ -131,9 +146,11 @@ public class GUI extends JFrame {
     private String getBinary(String input) {
         int maxIndex = (int) Math.pow(2, bitCount) - 1;
         String[] binaryValues = new String[maxIndex + 1];
-
-        for (int i = 0; i <= maxIndex; i++) {
-            binaryValues[i] = String.format("%0" + bitCount + "d", Integer.valueOf(Integer.toBinaryString(i)));
+        
+        if (binaryValues[0] == null) {
+            for (int i = 0; i <= maxIndex; i++) {
+                binaryValues[i] = String.format("%0" + bitCount + "d", Integer.valueOf(Integer.toBinaryString(i)));
+            }
         }
 
         try {
