@@ -5,26 +5,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Set;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 
 public class GUI extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private final JPanel mainPanel;
-    private final JLabel mintermLabel;
+    private  JLabel mintermLabel;
     private JTextField mintermInputField;
-    private final JButton nextButton;
-    private final JTextArea resultTextArea;
-    private final JButton calculateButton;
+    private  JButton nextButton;
+    private  JTextArea resultTextArea;
+    private  JButton calculateButton;
     private final int bitCount;
     public static Set<String> mintermSet;
     private String currentInput;
@@ -43,56 +34,61 @@ public class GUI extends JFrame {
         mainPanel.setBounds(0, 0, 500, 500);
         mainPanel.setLayout(null);
 
+        initializeMenuBar();
+        initializeComponents();
+
+        setVisible(true);
+        add(mainPanel);
+    }
+
+    private void initializeMenuBar() {
         MenuBar menuBar = new MenuBar();
         setJMenuBar(menuBar);
+    }
 
-        mintermLabel = new JLabel("Enter Minterm list: ");
-        mintermLabel.setBounds(50, 100, 150, 30);
-        mintermLabel.setFont(new Font("Verdana", Font.BOLD, 14));
-        mainPanel.add(mintermLabel);
+    private void initializeComponents() {
+        mintermLabel = createLabel("Enter Minterm list: ", 50, 100, 150, 30);
+        mintermInputField = createTextField(50, 140, 70, 30);
+        mintermInputField.addKeyListener(new InputValidationListener());
 
-        mintermInputField = new JTextField();
-        mintermInputField.setBounds(50, 140, 70, 30);
-
-        mintermInputField.addKeyListener(new KeyListener() {
-            @Override
-            public void keyPressed(KeyEvent event) {
-                // No action needed for keyPressed
-            }
-
-            @Override
-            public void keyTyped(KeyEvent event) {
-                // No action needed for keyTyped
-            }
-
-            @Override
-            public void keyReleased(KeyEvent event) {
-                String inputText = mintermInputField.getText();
-                validateInput(inputText);
-            }
-        });
-        mainPanel.add(mintermInputField);
-
-        nextButton = new JButton("Next");
-        nextButton.setBounds(140, 140, 70, 30);
+        nextButton = createButton("Next", 140, 140, 70, 30);
         nextButton.addActionListener((ActionEvent event) -> {
             mintermInputField.setText("");
             mintermList.setMinList(currentInput);
         });
-        mainPanel.add(nextButton);
 
         resultTextArea = new JTextArea();
         resultTextArea.setBounds(50, 200, 300, 200);
         resultTextArea.setEditable(false);
         mainPanel.add(resultTextArea);
 
-        calculateButton = new JButton("Calculate");
-        calculateButton.setBounds(400, 250, 100, 50);
+        calculateButton = createButton("Calculate", 400, 250, 100, 50);
         calculateButton.addActionListener((ActionEvent event) -> calculateAction());
-        mainPanel.add(calculateButton);
 
-        setVisible(true);
-        add(mainPanel);
+        mainPanel.add(mintermLabel);
+        mainPanel.add(mintermInputField);
+        mainPanel.add(nextButton);
+        mainPanel.add(resultTextArea);
+        mainPanel.add(calculateButton);
+    }
+
+    private JLabel createLabel(String text, int x, int y, int width, int height) {
+        JLabel label = new JLabel(text);
+        label.setBounds(x, y, width, height);
+        label.setFont(new Font("Verdana", Font.BOLD, 14));
+        return label;
+    }
+
+    private JTextField createTextField(int x, int y, int width, int height) {
+        JTextField textField = new JTextField();
+        textField.setBounds(x, y, width, height);
+        return textField;
+    }
+
+    private JButton createButton(String text, int x, int y, int width, int height) {
+        JButton button = new JButton(text);
+        button.setBounds(x, y, width, height);
+        return button;
     }
 
     private void calculateAction() {
@@ -118,27 +114,6 @@ public class GUI extends JFrame {
         resultTextArea.setText(quine.toString());
     }
 
-    private void validateInput(String inputText) {
-        try {
-            int input = parseInteger(inputText);
-            if (isValidRange(input)) {
-                currentInput = inputText;
-            } else {
-                showErrorMessage("Number should be within 0 to " + ((int) Math.pow(2, bitCount) - 1), "Error");
-            }
-        } catch (NumberFormatException e) {
-            showErrorMessage("Invalid input. Please enter a valid number.", "Error");
-        }
-    }
-
-    private int parseInteger(String inputText) {
-        return Integer.parseInt(inputText);
-    }
-
-    private boolean isValidRange(int input) {
-        return input >= 0 && input <= (int) Math.pow(2, bitCount) - 1;
-    }
-
     private void showErrorMessage(String message, String error) {
         JOptionPane.showMessageDialog(null, message, error, JOptionPane.ERROR_MESSAGE);
     }
@@ -146,7 +121,7 @@ public class GUI extends JFrame {
     private String getBinary(String input) {
         int maxIndex = (int) Math.pow(2, bitCount) - 1;
         String[] binaryValues = new String[maxIndex + 1];
-        
+
         if (binaryValues[0] == null) {
             for (int i = 0; i <= maxIndex; i++) {
                 binaryValues[i] = String.format("%0" + bitCount + "d", Integer.valueOf(Integer.toBinaryString(i)));
@@ -167,7 +142,7 @@ public class GUI extends JFrame {
 
     public static void main(String[] args) {
         try {
-            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     UIManager.setLookAndFeel(info.getClassName());
                     break;
@@ -194,5 +169,41 @@ public class GUI extends JFrame {
 
         GUI gui = new GUI(bitCount);
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    private class InputValidationListener implements KeyListener {
+
+        @Override
+        public void keyPressed(KeyEvent event) {
+            // No action needed for keyPressed
+        }
+
+        @Override
+        public void keyTyped(KeyEvent event) {
+            // No action needed for keyTyped
+        }
+
+        @Override
+        public void keyReleased(KeyEvent event) {
+            String inputText = mintermInputField.getText();
+            validateInput(inputText);
+        }
+
+        private void validateInput(String inputText) {
+            try {
+                int input = Integer.parseInt(inputText);
+                if (isValidRange(input)) {
+                    currentInput = inputText;
+                } else {
+                    showErrorMessage("Number should be within 0 to " + ((int) Math.pow(2, bitCount) - 1), "Error");
+                }
+            } catch (NumberFormatException e) {
+                showErrorMessage("Invalid input. Please enter a valid number.", "Error");
+            }
+        }
+
+        private boolean isValidRange(int input) {
+            return input >= 0 && input <= (int) Math.pow(2, bitCount) - 1;
+        }
     }
 }
