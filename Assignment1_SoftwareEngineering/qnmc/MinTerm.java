@@ -1,19 +1,18 @@
 package qnmc;
 
 public class MinTerm {
-	// input data representation
+
 	public static final char NOT_CH = '0';
 	public static final char SET_CH = '1';
 	public static final char ANY_CH = '_';
-	// internal data representation
+
 	protected static final int NOT = 0;
 	protected static final int SET = 1;
 	protected static final int ANY = -1;
-	// attribute
+
 	protected int count;
 	protected int[] term;
 
-	// constructing & reading
 	public MinTerm(String str) {
 		term = new int[str.length()];
 		for (int i = 0; i < str.length(); i++) {
@@ -24,8 +23,6 @@ public class MinTerm {
 			}
 		}
 	}
-
-	// converted to string
 
         @Override
 	public String toString() {
@@ -40,8 +37,6 @@ public class MinTerm {
 		return buf.toString();
 	}
 
-	// comparing minterm
-
 	public boolean isSame(MinTerm a) throws ExceptionQuine {
 		if (count != a.count)
 			throw new ExceptionQuine("MinTerm::isSame()");
@@ -52,8 +47,6 @@ public class MinTerm {
 		}
 		return true;
 	}
-
-	// number of the difference
 
 	public int resolutionCount(MinTerm a) throws ExceptionQuine {
 		if (count != a.count)
@@ -66,11 +59,9 @@ public class MinTerm {
 		return resCount;
 	}
 
-	// position of the first difference
-
-	public int resolutionPos(MinTerm a) throws ExceptionQuine {
+	public int resolutionPosition(MinTerm a) throws ExceptionQuine {
 		if (count != a.count)
-			throw new ExceptionQuine("MinTerm::resoutionPos()");
+			throw new ExceptionQuine("MinTerm::resolutionPos()");
 		for (int i = 0; i < count; i++) {
 			if (term[i] != a.term[i])
 				return i;
@@ -78,8 +69,6 @@ public class MinTerm {
 
 		return -1;
 	}
-
-	// combining two minterms
 
 	public static MinTerm combine(MinTerm a, MinTerm b) throws ExceptionQuine {
 		if (a.count != b.count)

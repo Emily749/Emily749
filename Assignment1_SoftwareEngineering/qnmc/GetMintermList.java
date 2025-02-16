@@ -17,8 +17,3 @@ public static Set<String> getMin(){
 	return set;
 }
 }
-
-
-
-
-

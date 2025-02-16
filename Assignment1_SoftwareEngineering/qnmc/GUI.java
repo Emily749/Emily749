@@ -113,7 +113,7 @@ public class GUI extends JFrame {
         try {
             Quine quine = new Quine();
             for (String minterm : mintermSet) {
-                quine.addTerm(getBinary(minterm));
+                quine.addMinTerms(getBinary(minterm));
             }
             quine.simplify();
             resultTextArea.setText(quine.toString());
