@@ -32,14 +32,14 @@ public class MenuBar extends JMenuBar {
             if (GUI.mintermSet != null) {
                 GUI.mintermSet.clear();
             }
-            
+
             String s = JOptionPane.showInputDialog("Enter the boolean bits (3 to 5): ");
             try {
                 bits = Integer.parseInt(s);
             } catch (NumberFormatException e) {
                 bits = 2;
             }
-            
+
             if (bits < 3 || bits > 5) {
                 JOptionPane.showMessageDialog(null,
                         "Invalid input. Bits must be between 3 and 5. Please press File and then NEW.",
