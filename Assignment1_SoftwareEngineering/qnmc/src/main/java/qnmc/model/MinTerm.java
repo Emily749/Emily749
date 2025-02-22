@@ -1,4 +1,4 @@
-package qnmc;
+package qnmc.model;
 
 public class MinTerm {
 

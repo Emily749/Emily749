@@ -1,4 +1,4 @@
-package qnmc;
+package qnmc.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;

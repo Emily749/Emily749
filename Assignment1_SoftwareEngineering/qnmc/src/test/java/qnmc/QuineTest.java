@@ -2,6 +2,9 @@ package qnmc;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import qnmc.model.ExceptionQuine;
+import qnmc.model.MinTerm;
+import qnmc.model.Quine;
 
 import static org.junit.jupiter.api.Assertions.*;
 

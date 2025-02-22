@@ -1,6 +1,8 @@
 package qnmc;
 
 import org.junit.jupiter.api.Test;
+import qnmc.model.ExceptionQuine;
+import qnmc.model.MinTerm;
 
 import static org.junit.jupiter.api.Assertions.*;
 

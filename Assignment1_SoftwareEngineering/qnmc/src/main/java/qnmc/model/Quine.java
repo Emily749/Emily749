@@ -1,7 +1,7 @@
-package qnmc;
+package qnmc.model;
 
 public class Quine {
-    protected static final int MAX_TERMS = 0xff;
+    public static final int MAX_TERMS = 0xff;
     private final MinTerm[] terms = new MinTerm[MAX_TERMS];
     private int count = 0;
 

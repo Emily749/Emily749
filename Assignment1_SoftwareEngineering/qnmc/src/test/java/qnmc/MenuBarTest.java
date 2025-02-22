@@ -5,6 +5,7 @@ import javax.swing.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import qnmc.view.MenuBar;
 
 import static org.junit.jupiter.api.Assertions.*;
 

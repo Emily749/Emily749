@@ -1,31 +1,35 @@
-package qnmc;
+package qnmc.view;
 
-import java.awt.Font;
+import qnmc.controller.QuineController;
+import qnmc.model.GetMintermList;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Set;
-import javax.swing.*;
 
 public class GUI extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private final JPanel mainPanel;
-    private  JLabel mintermLabel;
+    private JLabel mintermLabel;
     private JTextField mintermInputField;
-    private  JButton nextButton;
-    private  JTextArea resultTextArea;
-    private  JButton calculateButton;
+    private JButton nextButton;
+    private JTextArea resultTextArea;
+    private JButton calculateButton;
     private final int bitCount;
     public static Set<String> mintermSet;
     private String currentInput;
-    private static final GetMintermList mintermList = new GetMintermList();
+    private final QuineController quineController;
 
     public GUI(int bitCount) {
         super("Quine McCluskey Prime Implicant Generator");
 
         this.bitCount = bitCount;
         mintermSet = GetMintermList.getMin();
+        quineController = new QuineController(this);
 
         setLayout(null);
         setSize(550, 500);
@@ -54,7 +58,7 @@ public class GUI extends JFrame {
         nextButton = createButton("Next", 140, 140, 70, 30);
         nextButton.addActionListener((ActionEvent event) -> {
             mintermInputField.setText("");
-            mintermList.setMinList(currentInput);
+            quineController.handleNextButtonClick(currentInput);
         });
 
         resultTextArea = new JTextArea();
@@ -63,7 +67,7 @@ public class GUI extends JFrame {
         mainPanel.add(resultTextArea);
 
         calculateButton = createButton("Calculate", 400, 250, 100, 50);
-        calculateButton.addActionListener((ActionEvent event) -> calculateAction());
+        calculateButton.addActionListener((ActionEvent event) -> quineController.handleCalculateButtonClick());
 
         mainPanel.add(mintermLabel);
         mainPanel.add(mintermInputField);
@@ -91,53 +95,20 @@ public class GUI extends JFrame {
         return button;
     }
 
-    private void calculateAction() {
-        try {
-            Quine quine = new Quine();
-            processMinterms(quine);
-            quine.simplify();
-            updateResult(quine);
-        } catch (ExceptionQuine e) {
-            showErrorMessage("An error occurred during the Quine-McCluskey operation. Please check your input.", "Error");
-        } catch (Exception e) {
-            showErrorMessage("An unexpected error occurred. Please try again.", "Error");
-        }
+    public void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    private void processMinterms(Quine quine) throws ExceptionQuine {
-        for (String minterm : mintermSet) {
-            quine.addMinTerms(getBinary(minterm));
-        }
+    public void updateResultTextArea(String result) {
+        resultTextArea.setText(result);
     }
 
-    private void updateResult(Quine quine) {
-        resultTextArea.setText(quine.toString());
+    public int getBitCount() {
+        return bitCount;
     }
 
-    private void showErrorMessage(String message, String error) {
-        JOptionPane.showMessageDialog(null, message, error, JOptionPane.ERROR_MESSAGE);
-    }
-
-    private String getBinary(String input) {
-        int maxIndex = (int) Math.pow(2, bitCount) - 1;
-        String[] binaryValues = new String[maxIndex + 1];
-
-        if (binaryValues[0] == null) {
-            for (int i = 0; i <= maxIndex; i++) {
-                binaryValues[i] = String.format("%0" + bitCount + "d", Integer.valueOf(Integer.toBinaryString(i)));
-            }
-        }
-
-        try {
-            int index = Integer.parseInt(input);
-            if (index < 0 || index > maxIndex) {
-                throw new ArrayIndexOutOfBoundsException();
-            }
-            return binaryValues[index];
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            showErrorMessage("Invalid input. Please enter a number between 0 and " + maxIndex + ".", "Error");
-            return null;
-        }
+    public void setMintermSet(String input) {
+        mintermSet.add(input); // You could modify this logic based on how you want to handle the minterms.
     }
 
     public static void main(String[] args) {
@@ -195,10 +166,10 @@ public class GUI extends JFrame {
                 if (isValidRange(input)) {
                     currentInput = inputText;
                 } else {
-                    showErrorMessage("Number should be within 0 to " + ((int) Math.pow(2, bitCount) - 1), "Error");
+                    showErrorMessage("Number should be within 0 to " + ((int) Math.pow(2, bitCount) - 1));
                 }
             } catch (NumberFormatException e) {
-                showErrorMessage("Invalid input. Please enter a valid number.", "Error");
+                showErrorMessage("Invalid input. Please enter a valid number.");
             }
         }
 
