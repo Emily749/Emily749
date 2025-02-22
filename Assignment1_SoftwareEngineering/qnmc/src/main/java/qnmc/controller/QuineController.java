@@ -30,7 +30,7 @@ public class QuineController {
         try {
             Quine quine = new Quine();
             processMinterms(quine);
-            quine.simplify();
+            quine.simplifyMinterms();
             updateResult(quine);
         } catch (ExceptionQuine e) {
             gui.showErrorMessage("An error occurred during the Quine-McCluskey operation. Please check your input.");

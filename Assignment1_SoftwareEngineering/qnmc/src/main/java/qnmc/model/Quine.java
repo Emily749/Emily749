@@ -5,7 +5,6 @@ public class Quine {
     private final MinTerm[] terms = new MinTerm[MAX_TERMS];
     private int count = 0;
 
-    // Add a new minterm to the list
     public void addMinTerms(String str) throws ExceptionQuine {
         if (count == MAX_TERMS)
             throw new ExceptionQuine("Quine::addTerm() - Maximum terms reached.");
@@ -21,7 +20,6 @@ public class Quine {
         return buf.toString();
     }
 
-    // Check if a term exists in the list
     public boolean hasTerm(MinTerm a) throws ExceptionQuine {
         for (int i = 0; i < count; i++) {
             if (a.isSame(terms[i])) {
@@ -31,16 +29,14 @@ public class Quine {
         return false;
     }
 
-    // Simplify the set of minterms
-    public void simplify() throws ExceptionQuine {
+    public void simplifyMinterms() throws ExceptionQuine {
         int reductionCount;
         do {
-            reductionCount = reduce();
+            reductionCount = reduceTerms();
         } while (reductionCount > 0);
     }
 
-    // Perform the reduction of terms
-    private int reduce() throws ExceptionQuine {
+    private int reduceTerms() throws ExceptionQuine {
         int reducedCount = 0;
         MinTerm[] reducedTerms = new MinTerm[MAX_TERMS];
         boolean[] used = new boolean[MAX_TERMS];
@@ -65,7 +61,6 @@ public class Quine {
             }
         }
 
-        // Update terms array with reduced terms
         count = 0;
         for (int i = 0; i < totalReduced; i++) {
             if (!hasTerm(reducedTerms[i])) {
@@ -73,6 +68,6 @@ public class Quine {
             }
         }
 
-        return reducedCount;  // Return the number of reduced terms
+        return reducedCount;
     }
 }

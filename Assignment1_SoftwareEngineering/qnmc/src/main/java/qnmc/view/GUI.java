@@ -108,7 +108,7 @@ public class GUI extends JFrame {
     }
 
     public void setMintermSet(String input) {
-        mintermSet.add(input); // You could modify this logic based on how you want to handle the minterms.
+        mintermSet.add(input);
     }
 
     public static void main(String[] args) {
