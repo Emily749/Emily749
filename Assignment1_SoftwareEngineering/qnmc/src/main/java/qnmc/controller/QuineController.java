@@ -19,7 +19,6 @@ public class QuineController {
 
     public void handleNextButtonClick(String currentInput) {
         try {
-            // Validate input and add it to the minterm list
             gui.setMintermSet(currentInput);
         } catch (Exception e) {
             gui.showErrorMessage("Invalid input. Please enter a valid minterm.");
