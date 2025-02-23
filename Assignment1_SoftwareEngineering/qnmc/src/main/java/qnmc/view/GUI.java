@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class GUI extends JFrame implements Subject {
 
-    private static final long serialVersionUID = 1L;
+    private final long serialVersionUID = 1L;
     private final JPanel mainPanel;
     private JLabel mintermLabel;
     private JTextField mintermInputField;
