@@ -8,9 +8,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.HashSet;
 import java.util.Set;
 
-public class GUI extends JFrame {
+public class GUI extends JFrame implements Subject {
 
     private static final long serialVersionUID = 1L;
     private final JPanel mainPanel;
@@ -24,12 +25,16 @@ public class GUI extends JFrame {
     private String currentInput;
     private final QuineController quineController;
 
+    private final Set<Observer> observers;
+
     public GUI(int bitCount) {
         super("Quine McCluskey Prime Implicant Generator");
 
         this.bitCount = bitCount;
         mintermSet = GetMintermList.getMin();
         quineController = new QuineController(this);
+
+        observers = new HashSet<>();
 
         setLayout(null);
         setSize(550, 500);
@@ -59,6 +64,7 @@ public class GUI extends JFrame {
         nextButton.addActionListener((ActionEvent event) -> {
             mintermInputField.setText("");
             quineController.handleNextButtonClick(currentInput);
+            notifyObservers();
         });
 
         resultTextArea = new JTextArea();
@@ -109,6 +115,7 @@ public class GUI extends JFrame {
 
     public void setMintermSet(String input) {
         mintermSet.add(input);
+        notifyObservers();
     }
 
     public static void main(String[] args) {
@@ -140,6 +147,26 @@ public class GUI extends JFrame {
 
         GUI gui = new GUI(bitCount);
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        MintermObserver observer = new MintermObserver();
+        gui.registerObserver(observer);
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update(currentInput);
+        }
     }
 
     private class InputValidationListener implements KeyListener {
