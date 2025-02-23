@@ -118,6 +118,10 @@ public class GUI extends JFrame implements Subject {
         notifyObservers();
     }
 
+    public void updateMintermDisplay() {
+        resultTextArea.setText("");
+    }
+
     public static void main(String[] args) {
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -148,7 +152,7 @@ public class GUI extends JFrame implements Subject {
         GUI gui = new GUI(bitCount);
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        MintermObserver observer = new MintermObserver();
+        MintermObserver observer = new MintermObserver(gui);
         gui.registerObserver(observer);
     }
 

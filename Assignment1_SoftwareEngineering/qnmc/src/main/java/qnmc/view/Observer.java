@@ -1,5 +1,5 @@
 package qnmc.view;
 
 public interface Observer {
-    void update(String minterm);
+    void update(String currentInput);
 }

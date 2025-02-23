@@ -43,7 +43,6 @@ public class MinTerm {
         for (int i = 0; i < count; i++) {
             if (term[i] != a.term[i])
                 return false;
-
         }
         return true;
     }
