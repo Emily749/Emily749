@@ -58,17 +58,6 @@ public class MinTerm {
         return resCount;
     }
 
-    public int resolutionPosition(MinTerm a) throws ExceptionQuine {
-        if (count != a.count)
-            throw new ExceptionQuine("MinTerm::resolutionPos()");
-        for (int i = 0; i < count; i++) {
-            if (term[i] != a.term[i])
-                return i;
-        }
-
-        return -1;
-    }
-
     public static MinTerm combine(MinTerm a, MinTerm b) throws ExceptionQuine {
         if (a.count != b.count)
             throw new ExceptionQuine("MinTerm::combine()");
