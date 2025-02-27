@@ -162,11 +162,6 @@ public class GUI extends JFrame implements Subject {
     }
 
     @Override
-    public void removeObserver(Observer observer) {
-        observers.remove(observer);
-    }
-
-    @Override
     public void notifyObservers() {
         for (Observer observer : observers) {
             observer.update(currentInput);
