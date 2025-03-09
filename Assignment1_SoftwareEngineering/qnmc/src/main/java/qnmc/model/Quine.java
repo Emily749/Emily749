@@ -41,10 +41,8 @@ public class Quine {
         MinTerm[] reducedTerms = new MinTerm[MAX_TERMS];
         boolean[] used = new boolean[MAX_TERMS];
 
-        // Compare each pair of minterms
         for (int i = 0; i < count; i++) {
             for (int j = i + 1; j < count; j++) {
-                // Check if the minterms differ by exactly one bit
                 if (terms[i].resolutionCount(terms[j]) == 1) {
                     reducedTerms[reducedCount++] = MinTerm.combine(terms[i], terms[j]);
                     used[i] = true;
@@ -53,7 +51,6 @@ public class Quine {
             }
         }
 
-        // Add non-reduced minterms back into the list
         int totalReduced = reducedCount;
         for (int i = 0; i < count; i++) {
             if (!used[i]) {
